@@ -1,90 +1,3 @@
-// const express = require("express");
-// const cors = require("cors");
-// const bcrypt = require("bcryptjs");
-// const jwt = require("jsonwebtoken");
-// const pool = require("./db"); // Import the database connection
-
-// require("dotenv").config();
-// const app = express();
-// const PORT = process.env.PORT || 5000;
-// const SECRET = process.env.JWT_SECRET;
-
-// app.use(express.json());
-// app.use(cors());
-
-// // User Signup
-// app.post("/signup", async (req, res) => {
-//   try {
-//     const { name, email, password } = req.body;
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     const result = await pool.query(
-//       "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email",
-//       [name, email, hashedPassword]
-//     );
-
-//     res.json({ message: "User registered successfully!", user: result.rows[0] });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "User already exists or database error" });
-//   }
-// });
-
-// // User Login
-// app.post("/login", async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-
-//     if (result.rows.length === 0) {
-//       return res.status(401).json({ error: "Invalid credentials" });
-//     }
-
-//     const user = result.rows[0];
-//     const isMatch = await bcrypt.compare(password, user.password);
-
-//     if (!isMatch) {
-//       return res.status(401).json({ error: "Invalid credentials" });
-//     }
-
-//     const token = jwt.sign({ userId: user.id }, SECRET, { expiresIn: "1h" });
-//     res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Error logging in" });
-//   }
-// });
-
-// // Submit Anonymous Confession
-// app.post("/confession", async (req, res) => {
-//   try {
-//     const { message } = req.body;
-//     await pool.query("INSERT INTO confessions (message) VALUES ($1)", [message]);
-//     res.json({ message: "Confession submitted anonymously!" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Error submitting confession" });
-//   }
-// });
-
-// // Get All Confessions
-// app.get("/confessions", async (req, res) => {
-//   try {
-//     const result = await pool.query("SELECT message, created_at FROM confessions ORDER BY created_at DESC");
-//     res.json(result.rows);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Error fetching confessions" });
-//   }
-// });
-
-// app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-
-
-
-
-
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -107,14 +20,14 @@ app.get('/', (req, res) => {
 // ✅ User Signup Route
 app.post('/api/signup', async (req, res) => {
     try {
-      const { username, email, password } = req.body;
+      const { username, password } = req.body;
   
-      if (!username || !email || !password) {
+      if (!username || !password) {
         return res.status(400).json({ error: "All fields are required" });
       }
   
       // Check if user exists
-      const userExists = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+      const userExists = await pool.query("SELECT * FROM users WHERE email = $1", [username]);
       if (userExists.rows.length > 0) {
         return res.status(400).json({ error: "User already exists" });
       }
@@ -124,8 +37,8 @@ app.post('/api/signup', async (req, res) => {
   
       // Insert into DB
       const newUser = await pool.query(
-        "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *",
-        [username, email, hashedPassword]
+        "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
+        [username, hashedPassword]
       );
   
       res.status(201).json({ message: "User registered successfully", user: newUser.rows[0] });

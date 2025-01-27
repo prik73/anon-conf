@@ -1,27 +1,30 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  UserPlus, 
-  ShieldCheck, 
-  Wand2, 
-  Rocket, 
-  Feather, Mail
-} from "lucide-react";
+import {UserPlus,ShieldCheck,Wand2,Rocket,Feather, Mail} from "lucide-react";
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
   const [animationTrigger, setAnimationTrigger] = useState(0);
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
+  const handleSignup =  async (e) => {
     e.preventDefault();
     setAnimationTrigger(prev => (prev + 1) % 4);
+    try {
+      const response = await axios.post('/api/signup', { username, password }); // Relative URL
+      alert(response.data.message);
+      navigate('/login');
+    } catch (error) {
+      console.error('Signup Error:', error.response?.data || error.message);
+      alert(error.response?.data?.error || 'Something went wrong!');
+    }
+
   };
 
   const signupHints = [
@@ -94,7 +97,7 @@ const Signup = () => {
                   required
                 />
               </motion.div>
-              <motion.div 
+              {/* <motion.div 
                 initial={{ x: 50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -109,7 +112,7 @@ const Signup = () => {
                   className="pl-10 border-purple-300 focus:ring-purple-500"
                   required
                 />
-              </motion.div>
+              </motion.div> */}
               <motion.div 
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
