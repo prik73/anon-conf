@@ -29,18 +29,18 @@ const createTables = async () => {
         `);
 
         // Messages Table
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS messages (
-                id SERIAL PRIMARY KEY,
-                user_id INT REFERENCES users(id) ON DELETE CASCADE,
-                content TEXT NOT NULL,
-                likes INT DEFAULT 0,
-                is_anonymous BOOLEAN DEFAULT FALSE,
-                is_deleted BOOLEAN DEFAULT FALSE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
+            await pool.query(`
+                CREATE TABLE IF NOT EXISTS messages (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+                    content TEXT NOT NULL,
+                    likes INT DEFAULT 0,
+                    is_anonymous BOOLEAN DEFAULT FALSE,
+                    is_deleted BOOLEAN DEFAULT FALSE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            `);
 
         // Comments Table - Fixed the updated_at syntax
         await pool.query(`

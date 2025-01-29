@@ -4,6 +4,11 @@ import pool from "../config/db.js";
 const getMessages = async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM messages");
+
+    if (result.rows.length === 0) {
+      return res.status(200).json({ message: "🤔 No confessions yet! Be the first to share something." });
+    }
+
     res.status(200).json(result.rows);
   } catch (error) {
     console.error("❌ Error fetching messages:", error.message);
@@ -65,4 +70,37 @@ const commentOnMessage = async (req, res) => {
   }
 };
 
-export { getMessages, postMessage, deleteMessage, commentOnMessage };
+
+const commentOnComment = async (req, res) => {
+  try {
+    const { messageId, parentCommentId } = req.params;
+    const { content } = req.body;
+    const userId = req.user.id; // Extracted from token
+
+    const result = await pool.query(
+      "INSERT INTO comments (message_id, user_id, content, parent_comment_id) VALUES ($1, $2, $3, $4) RETURNING *",
+      [messageId, userId, content, parentCommentId]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error("❌ Error commenting on comment:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+//get a users' message
+const getUserMessages = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const result = await pool.query(
+      "SELECT * FROM messages WHERE user_id = (SELECT id FROM users WHERE username = $1)",
+      [username]
+    );
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("❌ Error fetching user's messages:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export { getMessages, postMessage, deleteMessage, commentOnMessage, commentOnComment };

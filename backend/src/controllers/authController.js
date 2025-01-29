@@ -92,7 +92,7 @@ const loginUser = async (req, res) => {
         username: user.rows[0].username,
         avatar_url: user.rows[0].avatar_url
       }, 
-      SECRET_KEY, 
+      process.env.JWT_SECRET, 
       { expiresIn: "1h" }
     );
 
