@@ -13,6 +13,26 @@ const validateSignup = (req, res, next) => {
     next();
   };
   
+  const validateLogin = (req, res, next) => {
+    const { username, password } = req.body;
+  
+    if (!username || !password) {
+      return res.status(400).json({ 
+        message: "Username and password are required.",
+        field: !username ? "username" : "password"
+      });
+    }
+  
+    if (password.length < 6) {
+      return res.status(400).json({ 
+        message: "Password must be at least 6 characters long.",
+        field: "password"
+      });
+    }
+  
+    next();
+  };
+  
   // Middleware to validate message inputs
   const validateMessage = (req, res, next) => {
     const { content } = req.body;
@@ -39,5 +59,5 @@ const validateSignup = (req, res, next) => {
     next();
   };
   
-  export { validateSignup, validateMessage, validateComment };
+  export { validateSignup, validateMessage, validateComment, validateLogin };
   

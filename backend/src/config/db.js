@@ -39,4 +39,4 @@ const pool = new Pool({
   })();
   
   // Export the pool for use in other files
-  module.exports = pool;
+  export default pool;

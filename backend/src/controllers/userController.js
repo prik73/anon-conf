@@ -1,4 +1,4 @@
-const pool = require("../config/db");
+import pool from "../config/db.js";
 
 // Get all messages
 const getMessages = async (req, res) => {
@@ -65,4 +65,4 @@ const commentOnMessage = async (req, res) => {
   }
 };
 
-module.exports = { getMessages, postMessage, deleteMessage, commentOnMessage };
+export { getMessages, postMessage, deleteMessage, commentOnMessage };

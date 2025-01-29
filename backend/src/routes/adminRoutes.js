@@ -1,8 +1,8 @@
-const express = require("express");
-const { deleteUser, deleteMessage, deleteComment } = require("../controllers/adminController");
-const { authenticateToken, requireAdmin } = require("../middleware/authMiddleware");
+import { Router } from "express";
+import { deleteUser, deleteMessage, deleteComment } from "../controllers/adminController.js";
+import { authenticateToken, requireAdmin } from "../middleware/authMiddleware.js";
 
-const router = express.Router();
+const router = Router();
 
 // Delete a user
 router.delete("/deleteUser/:userId", authenticateToken, requireAdmin, deleteUser);
@@ -13,4 +13,4 @@ router.delete("/deleteMessage/:messageId", authenticateToken, requireAdmin, dele
 // Delete a comment
 router.delete("/deleteComment/:commentId", authenticateToken, requireAdmin, deleteComment);
 
-module.exports = router;
+export default router;

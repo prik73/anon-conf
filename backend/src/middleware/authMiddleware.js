@@ -1,5 +1,4 @@
-const jwt = require("jsonwebtoken");
-
+import jwt from 'jsonwebtoken'
 // Middleware to authenticate token
 const authenticateToken = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1]; // Extract Bearer token
@@ -25,4 +24,4 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
-module.exports = { authenticateToken, requireAdmin };
+export { authenticateToken, requireAdmin };

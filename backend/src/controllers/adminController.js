@@ -1,5 +1,4 @@
-const pool = require("../config/db");
-
+import pool from "../config/db.js";
 // Delete a user
 const deleteUser = async (req, res) => {
   try {
@@ -36,4 +35,4 @@ const deleteComment = async (req, res) => {
   }
 };
 
-module.exports = { deleteUser, deleteMessage, deleteComment };
+export { deleteUser, deleteMessage, deleteComment };

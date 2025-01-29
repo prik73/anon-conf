@@ -1,8 +1,8 @@
-const express = require("express");
-const { getMessages, postMessage, deleteMessage, commentOnMessage } = require("../controllers/userController");
-const { authenticateToken } = require("../middleware/authMiddleware");
+import { Router } from "express";
+import { getMessages, postMessage, deleteMessage, commentOnMessage } from "../controllers/userController.js";
+import { authenticateToken } from "../middleware/authMiddleware.js";
 
-const router = express.Router();
+const router = Router();
 
 // Get all messages
 router.get("/messages", authenticateToken, getMessages);
@@ -16,4 +16,4 @@ router.delete("/messages/:messageId", authenticateToken, deleteMessage);
 // Comment on a message
 router.post("/comments/:messageId", authenticateToken, commentOnMessage);
 
-module.exports = router;
+export default router;
