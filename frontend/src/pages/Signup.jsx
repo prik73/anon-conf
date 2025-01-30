@@ -5,26 +5,37 @@ import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import {UserPlus,ShieldCheck,Wand2,Rocket,Feather, Mail} from "lucide-react";
+import { UserPlus, ShieldCheck, Wand2, Rocket, Feather, Mail } from "lucide-react";
+
+const API = axios.create({ baseURL: "http://localhost:5000/api/v1" });
 
 const Signup = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState({});
   const [animationTrigger, setAnimationTrigger] = useState(0);
   const navigate = useNavigate();
 
-  const handleSignup =  async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setAnimationTrigger(prev => (prev + 1) % 4);
+    setErrors({}); // Reset errors before submission
+
     try {
-      const response = await axios.post('/api/signup', { username, password }); // Relative URL
+      const response = await API.post('/auth/signup', formData);
       alert(response.data.message);
       navigate('/login');
     } catch (error) {
       console.error('Signup Error:', error.response?.data || error.message);
-      alert(error.response?.data?.error || 'Something went wrong!');
+      if (error.response?.data?.field) {
+        setErrors({ [error.response.data.field]: error.response.data.message });
+      } else {
+        alert('Something went wrong!');
+      }
     }
-
   };
 
   const signupHints = [
@@ -56,10 +67,7 @@ const Signup = () => {
               transition={{ duration: 0.5 }}
               className="cursor-pointer"
             >
-              <UserPlus 
-                className="text-purple-600 mb-4" 
-                size={64} 
-              />
+              <UserPlus className="text-purple-600 mb-4" size={64} />
             </motion.div>
             <h2 className="text-2xl font-bold text-purple-800 mb-2">
               Identity Forge
@@ -81,6 +89,7 @@ const Signup = () => {
 
           <CardContent className="col-span-2 p-10 flex flex-col justify-center">
             <form onSubmit={handleSignup} className="space-y-6">
+              {/* Username Field */}
               <motion.div 
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -91,13 +100,16 @@ const Signup = () => {
                 <Input 
                   type="text" 
                   placeholder="Choose Your Secret Username" 
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                   className="pl-10 border-purple-300 focus:ring-purple-500"
                   required
                 />
+                {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
               </motion.div>
-              {/* <motion.div 
+
+              {/* Email Field */}
+              <motion.div 
                 initial={{ x: 50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -107,12 +119,15 @@ const Signup = () => {
                 <Input 
                   type="email" 
                   placeholder="Anonymous Email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="pl-10 border-purple-300 focus:ring-purple-500"
                   required
                 />
-              </motion.div> */}
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              </motion.div>
+
+              {/* Password Field */}
               <motion.div 
                 initial={{ x: -50, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -123,30 +138,28 @@ const Signup = () => {
                 <Input 
                   type="password" 
                   placeholder="Unbreakable Passphrase" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="pl-10 border-purple-300 focus:ring-purple-500"
                   required
                 />
               </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button 
-                  type="submit" 
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                >
+
+              {/* Submit Button */}
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
                   Forge Identity
                 </Button>
               </motion.div>
+
+              {/* Already have an account? */}
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 className="text-center text-sm text-purple-600"
               >
-                Already have a secret? {' '}
+                Already have a secret?{' '}
                 <span 
                   onClick={() => navigate('/login')}
                   className="font-bold cursor-pointer hover:underline"

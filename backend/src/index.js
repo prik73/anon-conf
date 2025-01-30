@@ -9,10 +9,16 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 
 // Middlewares
 app.use(json()); // Parse JSON request body
-app.use(cors()); // Enable Cross-Origin Resource Sharing
+app.use(cors(
+  {
+    origin: "http://localhost:5173",
+    credentials: true,
+  }
+)); // Enable Cross-Origin Resource Sharing
 app.use(helmet()); // Secure HTTP headers
 app.use(morgan("dev")); // Log HTTP requests
 

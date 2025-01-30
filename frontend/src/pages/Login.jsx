@@ -1,129 +1,229 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserCircle2, KeyRound, Laugh, Egg, Sparkles } from "lucide-react";
-import Signup from "./Signup.jsx";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import { 
+  Lock, 
+  User, 
+  Eye, 
+  EyeOff, 
+  Loader2, 
+  MessageCircle,
+  Sparkles
+} from "lucide-react";
+
+const API = axios.create({ baseURL: "http://localhost:5000/api/v1" });
+const setToken = (token) => localStorage.setItem("authToken", token);
+
+const QuirkyText = ({ text, className }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 0.5, y: 0 }}
+    transition={{ duration: 1, repeat: Infinity, repeatType: "reverse" }}
+    className={className}
+  >
+    {text}
+  </motion.div>
+);
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  const [easterEggTriggered, setEasterEggTriggered] = useState(false);
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const res = await API.post("/auth/login", formData);
+      setToken(res.data.token);
+      navigate("/home");
+    } catch (err) {
+      setError("Your secret identity wasn't recognized...");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const triggerEasterEgg = () => {
-    setEasterEggTriggered(true);
-    setTimeout(() => setEasterEggTriggered(false), 2000);
-  };
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100 p-4"
-    >
-      <motion.div
-        initial={{ scale: 0.9, y: 50 }}
-        animate={{ scale: 1, y: 0 }}
-        transition={{ 
-          type: "spring", 
-          stiffness: 260, 
-          damping: 20 
-        }}
-        className="w-full max-w-xl"
-      >
-        <Card className="grid grid-cols-2 shadow-2xl border-2 border-purple-200/50">
-          {/* Left Side - Decorative */}
-          <div className="bg-purple-500/10 flex flex-col justify-center items-center p-8 text-center">
-            <motion.div
-              whileHover={{ rotate: [0, -10, 10, -10, 0] }}
-              transition={{ duration: 0.5 }}
-            >
-              <Laugh className="text-purple-600 mb-4" size={64} />
-            </motion.div>
-            <h2 className="text-xl font-bold text-purple-800 mb-2">
-            Unleash Your Secrets
-            
-            </h2>
-            <p className="text-purple-600 text-sm">
-            Where whispers become stories
-            </p>
-          </div>
+    <div className="min-h-screen overflow-hidden relative flex items-center justify-center bg-gradient-to-br from-purple-900 via-gray-900 to-black">
+      {/* Quirky background texts */}
+      <QuirkyText 
+        text="Secrets whispered..." 
+        className="absolute top-20 left-10 text-purple-300/30 text-2xl font-bold rotate-[-15deg]" 
+      />
+      <QuirkyText 
+        text="Stories untold..." 
+        className="absolute bottom-20 right-10 text-purple-300/30 text-2xl font-bold rotate-[15deg]" 
+      />
+      <QuirkyText 
+        text="Confess..." 
+        className="absolute top-40 right-20 text-purple-300/30 text-3xl font-bold" 
+      />
+      <QuirkyText 
+        text="Share anonymously" 
+        className="absolute bottom-40 left-20 text-purple-300/30 text-xl font-bold rotate-[-5deg]" 
+      />
 
-          {/* Right Side - Login Form */}
-          <CardContent className="p-8 flex flex-col justify-center">
-            <form onSubmit={handleLogin} className="space-y-4">
-              <motion.div 
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="relative"
-              >
-                <UserCircle2 className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
-                <Input 
-                  type="text" 
-                  placeholder="Username" 
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="pl-10 border-purple-300 focus:ring-purple-500"
-                  required
-                />
-              </motion.div>
-              <motion.div 
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="relative"
-              >
-                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
-                <Input 
-                  type="password" 
-                  placeholder="Secret Passphrase" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 border-purple-300 focus:ring-purple-500"
-                  required
-                />
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button 
-                  type="submit" 
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                >
-                  Reveal Secrets
-                </Button>
-              </motion.div>
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-center text-sm text-purple-600"
-              >
-                New here? 
-                <motion.span 
-                  whileHover={{ scale: 1.1 }}
-                  className="ml-1 font-bold cursor-pointer hover:underline flex items-center"
-                  onClick={() => navigate('/signup')}
-                >
-                  Create a Mysterious Identity
-                  <Egg className="ml-1 h-4 w-4" />
-                </motion.span>
-              </motion.div>
-            </form>
-          </CardContent>
-        </Card>
+      {/* Floating bubbles background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ 
+              opacity: [0.2, 0.5, 0.2], 
+              scale: [1, 1.2, 1],
+              x: [Math.random() * 100, Math.random() * -100],
+              y: [Math.random() * 100, Math.random() * -100],
+            }}
+            transition={{ 
+              duration: 10, 
+              repeat: Infinity, 
+              delay: i * 0.5 
+            }}
+            className="absolute"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+          >
+            <MessageCircle size={20} className="text-purple-500/20" />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Login Card */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md p-8 backdrop-blur-sm bg-white/10 rounded-lg shadow-2xl"
+      >
+        <style>
+          {`
+            input:-webkit-autofill,
+            input:-webkit-autofill:hover, 
+            input:-webkit-autofill:focus {
+              -webkit-box-shadow: 0 0 0 30px rgba(168, 85, 247, 0.1) inset !important;
+              -webkit-text-fill-color: rgb(243, 232, 255) !important;
+              caret-color: rgb(243, 232, 255) !important;
+              transition: background-color 5000s ease-in-out 0s;
+            }
+          `}
+        </style>
+
+        <div className="mb-8 text-center">
+          <motion.div
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 6, repeat: Infinity }}
+            className="inline-block"
+          >
+            <Sparkles className="text-purple-300 w-8 h-8 mb-2 mx-auto" />
+          </motion.div>
+          <h2 className="text-3xl font-bold text-center mb-2 text-purple-300">
+            Secret Confessions
+          </h2>
+          <p className="text-purple-200/60">Share your secrets, find your freedom</p>
+        </div>
+
+        {error && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-red-400 text-center mb-4"
+          >
+            {error}
+          </motion.p>
+        )}
+
+        <form onSubmit={handleLogin} className="space-y-6">
+          <motion.div 
+            className="relative"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <User className="absolute left-3 top-3 text-purple-300" size={18} />
+            <input
+              type="text"
+              placeholder="Secret Identity"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              className="w-full p-2 pl-10 bg-white/5 border border-purple-500/30 rounded-lg 
+                       text-purple-100 placeholder-purple-300/50 outline-none focus:border-purple-400
+                       transition-colors"
+            />
+          </motion.div>
+
+          <motion.div 
+            className="relative"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <Lock className="absolute left-3 top-3 text-purple-300" size={18} />
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Secret Code"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full p-2 pl-10 bg-white/5 border border-purple-500/30 rounded-lg 
+                       text-purple-100 placeholder-purple-300/50 outline-none focus:border-purple-400
+                       transition-colors"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-purple-300 hover:text-purple-100 transition-colors"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </motion.div>
+
+          <motion.button
+            type="submit"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full p-2 bg-purple-600/80 text-white rounded-lg hover:bg-purple-500/80 
+                     transition-colors disabled:bg-purple-400/50 disabled:cursor-not-allowed
+                     backdrop-blur-sm"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="animate-spin mx-auto" size={20} />
+            ) : (
+              "Enter the Confession Chamber"
+            )}
+          </motion.button>
+        </form>
+
+        {/* Signup Link */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 text-center"
+        >
+          <p className="text-purple-200/60">
+            Need a secret identity?{" "}
+            <Link 
+              to="/signup"
+              className="text-purple-300 hover:text-purple-100 transition-colors
+                         relative group"
+            >
+              Create one here
+              <motion.span
+                className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-300
+                         group-hover:w-full transition-all duration-300"
+              />
+            </Link>
+          </p>
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 
