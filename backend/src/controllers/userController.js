@@ -3,11 +3,20 @@ import pool from "../config/db.js";
 // Get all messages
 const getMessages = async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM messages");
+    const result = await pool.query(`
+      SELECT 
+          messages.*, 
+          users.username, 
+          users.avatar_url
+      FROM messages
+      JOIN users ON messages.user_id = users.id
+      ORDER BY messages.created_at DESC;
+  `);
+  
 
     if (result.rows.length === 0) {
       return res.status(200).json({ message: "🤔 No confessions yet! Be the first to share something." });
-    }
+    } 
 
     res.status(200).json(result.rows);
   } catch (error) {
