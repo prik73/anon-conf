@@ -27,7 +27,7 @@ const createTables = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-
+            
         // Messages Table
             await pool.query(`
                 CREATE TABLE IF NOT EXISTS messages (

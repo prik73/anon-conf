@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 
 const API = axios.create({ baseURL: "http://localhost:5000/api/v1" });
-const setToken = (token) => localStorage.setItem("authToken", token);
+const setToken = (token) => localStorage.setItem("Authorization", token);
+
 
 const QuirkyText = ({ text, className }) => (
   <motion.div
